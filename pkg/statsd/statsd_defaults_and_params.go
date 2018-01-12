@@ -44,6 +44,8 @@ const (
 	DefaultIgnoreHost = false
 	// DefaultMetricsAddr is the default address on which to listen for metrics.
 	DefaultMetricsAddr = ":8125"
+	// DefaultMetricsAddr is the default network on which to listen for metrics.
+	DefaultMetricsNetwork = "udp"
 	// DefaultMaxQueueSize is the default maximum number of buffered metrics per worker.
 	DefaultMaxQueueSize = 10000 // arbitrary
 	// DefaultMaxConcurrentEvents is the default maximum number of events sent concurrently.
@@ -107,6 +109,8 @@ const (
 	ParamCacheNegativeTTL = "cloud-cache-negative-ttl"
 	// ParamMetricsAddr is the name of parameter with address on which to listen for metrics.
 	ParamMetricsAddr = "metrics-addr"
+	// ParamMetricsNetwork is the name of parameter with network on which to listen for metrics.
+	ParamMetricsNetwork = "metrics-network"
 	// ParamNamespace is the name of parameter with namespace for all metrics.
 	ParamNamespace = "namespace"
 	// ParamPercentThreshold is the name of parameter with list of applied percentiles.
@@ -135,6 +139,7 @@ func AddFlags(fs *pflag.FlagSet) {
 	fs.Duration(ParamCacheTTL, DefaultCacheTTL, "Cloud cache TTL for successful lookups")
 	fs.Duration(ParamCacheNegativeTTL, DefaultCacheNegativeTTL, "Cloud cache TTL for failed lookups")
 	fs.String(ParamMetricsAddr, DefaultMetricsAddr, "Address on which to listen for metrics")
+	fs.String(ParamMetricsNetwork, DefaultMetricsNetwork, "Network on which to listen for metrics (tcp|udp)")
 	fs.String(ParamNamespace, "", "Namespace all metrics")
 	fs.StringSlice(ParamBackends, DefaultBackends, "Comma-separated list of backends")
 	fs.Int(ParamMaxCloudRequests, DefaultMaxCloudRequests, "Maximum number of cloud provider requests per second")

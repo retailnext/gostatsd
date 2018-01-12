@@ -123,11 +123,15 @@ func (dr *DatagramReceiver) Receive(ctx context.Context, c net.PacketConn) {
 }
 
 func getIP(addr net.Addr) gostatsd.IP {
-	if a, ok := addr.(*net.UDPAddr); ok {
+	switch a := addr.(type) {
+	case *net.UDPAddr:
 		return gostatsd.IP(a.IP.String())
+	case *net.TCPAddr:
+		return gostatsd.IP(a.IP.String())
+	default:
+		log.Errorf("Cannot get source address %q of type %T", addr, addr)
+		return gostatsd.UnknownIP
 	}
-	log.Errorf("Cannot get source address %q of type %T", addr, addr)
-	return gostatsd.UnknownIP
 }
 
 // bufferPool is a strongly typed wrapper around a sync.Pool for *[][]byte

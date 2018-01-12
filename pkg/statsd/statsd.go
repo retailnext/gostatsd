@@ -2,6 +2,7 @@ package statsd
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net"
 	"os"
@@ -9,6 +10,7 @@ import (
 	"time"
 
 	"github.com/atlassian/gostatsd"
+	"github.com/atlassian/gostatsd/pkg/statsd/tcplistener"
 	stats "github.com/atlassian/gostatsd/pkg/statser"
 
 	"github.com/ash2k/stager"
@@ -36,6 +38,7 @@ type Server struct {
 	MaxConcurrentEvents int
 	MaxEventQueueSize   int
 	MetricsAddr         string
+	MetricsNetwork      string
 	Namespace           string
 	PercentThreshold    []float64
 	IgnoreHost          bool
@@ -49,7 +52,16 @@ type Server struct {
 
 // Run runs the server until context signals done.
 func (s *Server) Run(ctx context.Context) error {
-	return s.RunWithCustomSocket(ctx, socketFactory(s.MetricsAddr, s.ConnPerReader))
+	var sf SocketFactory
+	switch s.MetricsNetwork {
+	case "udp":
+		sf = socketFactory(s.MetricsAddr, s.ConnPerReader)
+	case "tcp":
+		sf = tcplistener.SocketFactory(s.MetricsAddr)
+	default:
+		return errors.New("metrics-network must be 'udp' or 'tcp'")
+	}
+	return s.RunWithCustomSocket(ctx, sf)
 }
 
 // SocketFactory is an indirection layer over net.ListenPacket() to allow for different implementations.
